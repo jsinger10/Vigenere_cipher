@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 public class Vigener_cipher {
     //start by setting up table
     String letters_for_table = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -50,6 +52,10 @@ public class Vigener_cipher {
                     System.out.print(ANSI_RED + "[" + table[r][c] + "]" + ANSI_RESET);
                 else if (coords[0] == r && coords[1] == c)
                     System.out.print(ANSI_YELLOW + "[" + table[r][c] + "]" + ANSI_RESET);
+                else if (coords[0] == r && coords[1]!=0)
+                    System.out.print(ANSI_GREEN + "[" + table[r][c] + "]" + ANSI_RESET);
+                else if (coords[0] !=0 && coords[1]==c)
+                    System.out.print(ANSI_GREEN + "[" + table[r][c] + "]" + ANSI_RESET);
                 else
                     System.out.print(ANSI_BLUE + "[" + table[r][c] + "]" + ANSI_RESET);
             }
@@ -58,17 +64,27 @@ public class Vigener_cipher {
         System.out.println();
     }
     public String encoder(){
-        return encoder(message, key);
+        String enc = encoder(message, key);
+        message = enc;
+        return enc;
     }
 
     private String encoder(String message, String key){
         String output="";
         int tracker = 0;
         int[] coords = new int[2];
+        Scanner e = new Scanner(System.in);
+        String cont="y";
         while (output.length()<message.length()){
             coords = locater(key.charAt(tracker%key.length()), message.charAt(tracker));
             output = output.concat(table[coords[0]][coords[1]]);
             tracker++;
+            if (cont.compareTo("y")==0) {
+                System.out.println(ANSI_CYAN+"Enter y to continue, anything else to not show visual"+ANSI_RESET);
+                cont = e.nextLine();
+                table_printer(coords);
+                System.out.println(ANSI_PURPLE+ output + ANSI_RESET);
+            }
         }
         System.out.println(output);
         return output;
@@ -77,29 +93,40 @@ public class Vigener_cipher {
         int[] coords = new int[2];
         coords[0] = key_letter-64;
         coords[1] = plaintext_letter-64;
-        //table_printer(coords);
         return coords;
     }
 
     public String decoder(){
-        return decoder(message, key);
+        message = decoder(message, key);
+        return message;
     }
     private String decoder(String message, String key){
         String output="";
         int tracker = 0;
         int[] coords = new int[2];
         while (output.length()<message.length()){
-            coords = locater(key.charAt(tracker%key.length()), message.charAt(tracker));
+            coords = decode_locater(key.charAt(tracker%key.length()), message.charAt(tracker));
             output = output.concat(table[0][coords[1]]);
             tracker++;
         }
         System.out.println(output);
         return output;
     }
+    private int[] decode_locater(Character keychar, Character plainchar){
+        int[] coords = new int[2];
+        coords[0] = 0;
+        for (int i = 0; i < 26; i++){
+            if (table[keychar-64][i].compareTo(Character.toString(plainchar))==0){
+                coords[1]=i;
+            }
+        }
+        return coords;
+    }
     public static void main(String[] args) {
-        Vigener_cipher t = new Vigener_cipher("JulianSinger", "DTF", "");
+        Vigener_cipher t = new Vigener_cipher("JulianSinger", "DDT", "");
         t.encoder();
         t.decoder();;
+
     }
 }
 
