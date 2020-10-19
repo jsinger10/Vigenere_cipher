@@ -17,7 +17,6 @@ public class Vigener_cipher {
 
     String[][] table = new String[27][27];
     {
-        System.out.println(letters_for_table.charAt(25));
         table[0][0]=" ";//this sets up the initial columns and rows
         for (int i = 1; i < 27; i++){
             table[0][i] = Character.toString(letters_for_table.charAt(i-1));
@@ -31,19 +30,26 @@ public class Vigener_cipher {
             letters_for_table = letters_for_table.substring(1, 26) + Character.toString(letters_for_table.charAt(0));
             //System.out.println(letters_for_table);
         }
-        for (int r = 0; r < 27; r++){
-            for (int c = 0; c < 27; c++) {
-                if (r==0 | c==0)
-                    System.out.print(ANSI_RED + "[" + table[r][c] + "]" + ANSI_RESET);
-                else
-                    System.out.print(ANSI_BLUE + "[" + table[r][c] + "]" + ANSI_RESET);
-            }
-            System.out.println();
-        }
+//        for (int r = 0; r < 27; r++){
+//            for (int c = 0; c < 27; c++) {
+//                if (r==0 | c==0)
+//                    System.out.print(ANSI_RED + "[" + table[r][c] + "]" + ANSI_RESET);
+//                else
+//                    System.out.print(ANSI_BLUE + "[" + table[r][c] + "]" + ANSI_RESET);
+//            }
+//            System.out.println();
+//        }
     }
-    public Vigener_cipher(String input, String encryption_key, String direction){
+    public Vigener_cipher(String input, String encryption_key, Boolean encode, String visuals){
         message = input.toUpperCase();
         key = encryption_key.toUpperCase();
+        if(encode==true){
+            message = encoder(visuals);
+        }
+        else
+        {
+            message = decoder();
+        }
     }
     private void table_printer(int[] coords){
         for (int r = 0; r < 27; r++){
@@ -63,18 +69,18 @@ public class Vigener_cipher {
         }
         System.out.println();
     }
-    public String encoder(){
-        String enc = encoder(message, key);
+    public String encoder(String visuals){
+        String enc = encoder(message, key, visuals);
         message = enc;
         return enc;
     }
 
-    private String encoder(String message, String key){
+    private String encoder(String message, String key, String visuals){
         String output="";
         int tracker = 0;
         int[] coords = new int[2];
         Scanner e = new Scanner(System.in);
-        String cont="y";
+        String cont=visuals;
         while (output.length()<message.length()){
             coords = locater(key.charAt(tracker%key.length()), message.charAt(tracker));
             output = output.concat(table[coords[0]][coords[1]]);
@@ -82,8 +88,10 @@ public class Vigener_cipher {
             if (cont.compareTo("y")==0) {
                 System.out.println(ANSI_CYAN+"Enter y to continue, anything else to not show visual"+ANSI_RESET);
                 cont = e.nextLine();
-                table_printer(coords);
-                System.out.println(ANSI_PURPLE+ output + ANSI_RESET);
+                if (cont.compareTo("y")==0) {
+                    table_printer(coords);
+                    System.out.println(ANSI_PURPLE + output + ANSI_RESET);
+                }
             }
         }
         System.out.println(output);
@@ -123,10 +131,26 @@ public class Vigener_cipher {
         return coords;
     }
     public static void main(String[] args) {
-        Vigener_cipher t = new Vigener_cipher("JulianSinger", "DDT", "");
-        t.encoder();
-        t.decoder();;
-
+        Vigener_cipher obj;
+        if (args.length!=0){
+            if (args[0].compareTo("encode")==0){
+                if (args.length==4)
+                {
+                    if (args[3].compareTo("y")==0)
+                        obj= new Vigener_cipher(args[1],args[2],true, "y");
+                    else
+                        obj= new Vigener_cipher(args[1],args[2],true, "");
+                }
+                else
+                    obj= new Vigener_cipher(args[1],args[2],true, "");
+            }
+            else
+                obj = new Vigener_cipher(args[1],args[2],false, "");
+        }
+        else {
+            Vigener_cipher julian_encode = new Vigener_cipher("JulianSinger", "superb", true, "y");
+            Vigener_cipher julian_decode = new Vigener_cipher("BOAMROKCCKVS", "superb", false, "y");
+        }
     }
 }
 
